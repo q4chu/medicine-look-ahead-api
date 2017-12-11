@@ -18,7 +18,7 @@ Mysql.prototype.reconnect = function(cb) {
 
 Mysql.prototype.connect = function(cb) {
     var me = this;
-    logger.debug('connecting ...');
+    console.log('connecting ...');
 
     this._connection = db.createConnection({
         host : this._host,
@@ -28,9 +28,9 @@ Mysql.prototype.connect = function(cb) {
     });
     this._connection.connect(function(err) {
         if (err)  {
-            logger.debug(err);
+            console.log(err);
         } else {
-            logger.debug('db connected')
+            console.log('db connected')
             if (cb) {
                 cb();
             }
@@ -38,7 +38,7 @@ Mysql.prototype.connect = function(cb) {
     });
 
     this._connection.on('error', function(err) {
-        logger.debug(err);
+        console.log(err);
         me.reconnect();
     });
 };
@@ -47,7 +47,7 @@ Mysql.prototype.exec = function(sql, cb) {
     var me = this;
     this._connection.query(sql, function(err, result, fields) {
         if (err) {
-            logger.debug(err);
+            console.log(err);
             if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
                 me.reconnect(function(){
                     me.exec(sql, cb);
@@ -58,7 +58,7 @@ Mysql.prototype.exec = function(sql, cb) {
             }
         } else {
             if(!result.length) {
-                logger.debug("query empty");
+                console.log("query empty");
             }
             if (cb) {
                 cb(result, fields);

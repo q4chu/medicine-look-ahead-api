@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script>
+        var createTable = function(){
+            var number = $(document).find('input[name="din"]').val();
+            if(!number) {
+                alert("no din number");
+                return;
+            }
+            $.get('http://localhost:3000/lookahead/dinId/' + number,function(data,status){
+                var html = '<tr><td>din number</td><td>product formal name</td></tr>';
+                data.forEach(function(d){
+                   html += '<tr>';
+                   html += '<td>' + d.health_canada_identifier + '</td>';
+                   html += '<td>' + d.mp_formal_name + '</td>';
+                   html += '</tr>';
+                });
+                $(document).find('table[name="drug-din"]').html(html);
+            });
+        };
+
+        var selectCategory = function() {
+            var category = $(this).val();
+            console.log(category);
+            if(!category) {
+                $(document).find('table[name="drug-list"]').html('');
+                return;
+            }
+            $.get('http://localhost:3000/lookahead/category/' + category,function(data,status){
+                if(data && data.length) {
+                    var html = '<tr><td>din number</td><td>product formal name</td></tr>';
+                }
+                data.forEach(function(d){
+                    html += '<tr>';
+                    html += '<td>' + d.health_canada_identifier + '</td>';
+                    html += '<td>' + d.mp_formal_name + '</td>';
+                    html += '</tr>';
+                });
+                $(document).find('table[name="drug-list"]').html(html);
+            });
+        };
+
+        var showDrug = _.debounce(function(){
+            var drug = $(document).find('input[name="drug"]').val();
+            if(!drug) {
+                $(document).find('table[name="drug-name"]').html('');
+                return;
+            }
+            $.get('http://localhost:3000/lookahead/drug/' + drug,function(data,status){
+                var html = '<tr><td>din number</td><td>product formal name</td></tr>';
+                data.forEach(function(d){
+                    html += '<tr>';
+                    html += '<td>' + d.health_canada_identifier + '</td>';
+                    html += '<td>' + d.mp_formal_name + '</td>';
+                    html += '</tr>';
+                });
+                $(document).find('table[name="drug-name"]').html(html);
+            });
+        },500);
+
+        var showGuess = _.debounce(function(){
+            var guess = $(document).find('input[name="guess"]').val();
+            $list = $(document).find('datalist#guess-list');
+            if(!guess) {
+                $(document).find('table[name="drug-name"]').html('');
+                $list.empty();
+                return;
+            }
+            $.get('http://localhost:3000/lookahead/guess/' + guess,function(data,status){
+                $list.empty();
+                data.forEach(function(d){
+                    var option = document.createElement('option');
+                    option.value = d.tm_formal_name;
+                    $list.append(option);
+                });
+            });
+        },500);
+
+        $(document).ready(function(){
+            $(document).find('button[name="searchDin"]').click(createTable);
+            $(document).find('input[name="drug"]').keyup(showDrug);
+            $(document).find('input[name="guess"]').on({
+                change:selectCategory,
+                keyup:showGuess
+            });
+        });
+    </script>
+    <title>Drug Look Ahead</title>
+</head>
+<body>
+    <h4>search by din</h4>
+    <input type="text" name="din" placeholder="din number">
+    <button type="button" name="searchDin" >search</button>
+    <table name="drug-din"></table>
+
+    <h4>search by drug name</h4>
+    <input type="text" name="drug" placeholder="drug name">
+    <table name="drug-name"></table>
+
+    <h4>search by category name and show drugs of selected category</h4>
+    <input list="guess-list" type="text" name="guess" placeholder="category name">
+    <datalist id="guess-list"></datalist>
+    <table name="drug-list"></table>
+</body>
+</html>
