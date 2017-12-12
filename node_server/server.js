@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('./core/mysql');
+const bodyParser = require('body-parser');
 const global = require('./core/global');
 const app = express();
 
@@ -15,7 +16,8 @@ app.all('*',(req,res,next) => {
     next();
 });
 
-app.get('/', (req,res) => res.send('hello world'));
+app.use(express.static('public'));
+
 app.get('/lookahead/dinId/:id',(req,res) => {
     lookAhead.searchByDin(req.params.id,res);
 });

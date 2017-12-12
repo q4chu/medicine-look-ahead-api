@@ -46,8 +46,10 @@ exports.searchByName = function(name,res) {
         var prioritized_arr = [],unprioritized_arr = [] ;
         results.forEach((result) => {
             if(result.in_formulary) {
+                result.in_formulary = 1;
                 prioritized_arr.push(result);
             } else {
+                result.in_formulary = 0;
                 unprioritized_arr.push(result);
             }
         });
