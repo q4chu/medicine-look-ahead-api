@@ -19,7 +19,12 @@ app.all('*',(req,res,next) => {
 app.use(express.static('public'));
 
 app.get('/lookahead/dinId/:id',(req,res) => {
-    lookAhead.searchByDin(req.params.id,res);
+    var id = req.params.id;
+    if(!isNaN(id)) {
+        lookAhead.searchByDin(req.params.id,res);
+    } else {
+        res.status(400).send('invalid id');
+    }
 });
 
 app.get('/lookahead/guess/:guess',(req,res) => {

@@ -1,5 +1,5 @@
 var global = require('./global');
-var db = global.mysql || 'nothning here';
+var db = global.mysql;
 
 exports.searchByDin = function(din,res) {
     console.log('din number is: ' + din);

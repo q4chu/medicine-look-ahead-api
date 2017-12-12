@@ -6,9 +6,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script>
         var emptyMsg = "no result";
+        var errorId = "invalid Id"
 
-        var noResult = function($element) {
-            $element.find('p.empty').html(emptyMsg);
+        var showMsg = function($element,msg) {
+            $element.find('p.empty').html(msg);
             setTimeout(function() {
                 $element.find('p.empty').html('');
             },1000);
@@ -26,7 +27,7 @@
             $.get('http://localhost:3000/lookahead/dinId/' + number,function(data,status){
                 $dinTable.html('');
                 if(!data.length) {
-                    noResult($din);
+                    showMsg($din,emptyMsg);
                     return;
                 }
                 var html = '<tr><td>din number</td><td>product formal name</td></tr>';
@@ -37,7 +38,10 @@
                    html += '</tr>';
                 });
                 $dinTable.html(html);
-            });
+            })
+                .fail(function(){
+                    showMsg($din,errorId);
+                });
         };
 
         var showDrug = _.debounce(function(){
@@ -51,7 +55,7 @@
             $.get('http://localhost:3000/lookahead/drug/' + drug,function(data,status){
                 $drugTable.html('');
                 if(!data.length) {
-                    noResult($drug);
+                    showMsg($din,emptyMsg);
                     return;
                 }
                 var html = '<tr><td>din number</td><td>product formal name</td></tr>';
@@ -107,7 +111,7 @@
             $.get('http://localhost:3000/lookahead/category/' + category,function(data,status){
                 $drugTable.html('');
                 if(!data.length) {
-                    noResult($guess);
+                    showMsg($din,emptyMsg);
                     return;
                 }
                 var html = '<tr><td>din number</td><td>product formal name</td></tr>';
